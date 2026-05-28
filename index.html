@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EM Soluções - Painel de Engenharia de Custos</title>
+    <!-- Tailwind CSS para Estilização de Alta Performance -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ícones modernos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+        }
+        /* Estilos específicos para impressão limpa do orçamento */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #area-impressao, #area-impressao * {
+                visibility: visible;
+            }
+            #area-impressao {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background-color: white !important;
+                color: black !important;
+                padding: 20px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 px-4 py-4 md:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-600 text-white px-3.5 py-2 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-blue-500/20">
+                EM <span class="text-green-400">S</span>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold text-white tracking-tight leading-tight">EM Soluções | Climatização</h1>
+                <p class="text-xs text-slate-400">Sistema de Precificação Assertiva & Engenharia de Custos</p>
+            </div>
+        </div>
+        
+        <!-- NAVEGAÇÃO DE ABAS PRINCIPAIS -->
+        <nav class="flex bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+            <button onclick="mudarAba('calculadora')" id="tab-calculadora" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all bg-blue-600 text-white">
+                <i data-lucide="calculator" class="w-4 h-4"></i> Projetar Orçamento
+            </button>
+            <button onclick="mudarAba('configuracao')" id="tab-configuracao" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all text-slate-400 hover:text-white">
+                <i data-lucide="sliders" class="w-4 h-4"></i> Tabela de Preços Base
+            </button>
+            <button onclick="mudarAba('historico')" id="tab-historico" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all text-slate-400 hover:text-white">
+                <i data-lucide="folder-kanban" class="w-4 h-4"></i> Histórico
+            </button>
+        </nav>
+    </header>
+
+    <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 md:p-8">
+
+        <!-- ================= ABA 1: CALCULADORA DE PROJETOS ================= -->
+        <section id="aba-calculadora" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- FORMULÁRIO DE ENTRADA DO PROJETO (Esquerda) -->
+                <div class="lg:col-span-7 bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="edit-3" class="text-blue-500 w-5 h-5"></i> Dados e Dimensionamento do Serviço
+                        </h2>
+                        <span class="text-xs text-slate-500">Insira as especificações reais</span>
+                    </div>
+
+                    <!-- 1. Dados do Cliente -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nome do Cliente</label>
+                            <input type="text" id="proj-cliente" placeholder="Ex: Condomínio Edifício Paulista" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">WhatsApp / Telefone</label>
+                            <input type="text" id="proj-fone" placeholder="Ex: (11) 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Bairro / Cidade</label>
+                            <input type="text" id="proj-bairro" placeholder="Ex: Pinheiros - São Paulo/SP" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Endereço de Instalação</label>
+                            <input type="text" id="proj-endereco" placeholder="Ex: Alameda Lorena, 150" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- 2. Equipamento e Capacidade -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Tipo de Sistema</label>
+                            <select id="proj-sistema" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" onchange="atualizarInterfaceCapacidades()">
+                                <option value="split">Split Hi-Wall</option>
+                                <option value="piso_teto">Piso Teto</option>
+                                <option value="cassete_1v">Cassete 1 Via</option>
+                                <option value="cassete_4v">Cassete 4 Vias</option>
+                                <option value="multi_split">Multi-Split</option>
+                                <option value="vrf">VRF / VRV</option>
+                                <option value="chiller">Chiller</option>
+                                <option value="splitao">Splitão</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Capacidade em BTUs</label>
+                            <select id="proj-btu" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <!-- Preenchido dinamicamente via JS de acordo com o sistema -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Quantidade Máquinas</label>
+                            <input type="number" id="proj-qtd" value="1" min="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- 3. Consumo de Materiais (Metragem Real) -->
+                    <div>
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider mb-3">Consumo de Infraestrutura & Bitola do Cobre</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Bitola Cobre Principal</label>
+                                <select id="proj-bitola-1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="bitola_14">1/4" (Linha Líquido)</option>
+                                    <option value="bitola_38">3/8" (Gás)</option>
+                                    <option value="bitola_12">1/2" (Gás)</option>
+                                    <option value="bitola_58">5/8" (Gás)</option>
+                                    <option value="bitola_34">3/4" (Gás)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Metros de Tubulação (Bitola 1)</label>
+                                <input type="number" id="proj-cobre-m1" value="3" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Metros Cabo PP (Alimentação)</label>
+                                <input type="number" id="proj-cabo-pp" value="5" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Bitola Cobre Retorno/Secundário</label>
+                                <select id="proj-bitola-2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="nenhuma">Nenhuma / Só 1 linha</option>
+                                    <option value="bitola_14">1/4" (Linha Líquido)</option>
+                                    <option value="bitola_38" selected>3/8" (Gás)</option>
+                                    <option value="bitola_12">1/2" (Gás)</option>
+                                    <option value="bitola_58">5/8" (Gás)</option>
+                                    <option value="bitola_34">3/4" (Gás)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Metros de Tubulação (Bitola 2)</label>
+                                <input type="number" id="proj-cobre-m2" value="3" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Suporte Condensadora</label>
+                                <select id="proj-suporte" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="suporte_p">Pequeno (9k a 12k BTUs)</option>
+                                    <option value="suporte_m">Médio (18k a 24k BTUs)</option>
+                                    <option value="suporte_g">Grande (30k a 60k BTUs)</option>
+                                    <option value="nenhum">Não necessita suporte</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- 4. Fatores de Complexidade, Logística e Margens -->
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider">Fatores de Complexidade & Operação</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Trabalho em Altura</label>
+                                <select id="proj-altura" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="nenhum">Nenhum (Térreo/Janela)</option>
+                                    <option value="escada">Escada Grande (Até 5m)</option>
+                                    <option value="andaime">Andaime Técnico</option>
+                                    <option value="rapel">Acesso por Alpinismo / Rapel</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Estado da Infraestrutura</label>
+                                <select id="proj-infra" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="existente">Já existente (Apenas Conectar/Flangear)</option>
+                                    <option value="exposta">Infra Exposta com Canaleta</option>
+                                    <option value="embutida_parede">Embutir em Parede (Rasgar Alvenaria)</option>
+                                    <option value="embutida_gesso">Embutir em Forro de Gesso</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Acesso ao Local</label>
+                                <select id="proj-acesso" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" onchange="alternarCampoAndar()">
+                                    <option value="terreo">Térreo / Casa / Fácil Acesso</option>
+                                    <option value="elevador">Prédio Comercial/Residencial COM Elevador</option>
+                                    <option value="sem_elevador">Prédio SEM Elevador (Subir Escadas)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Andares (Ocultado se tiver elevador/térreo) -->
+                        <div id="container-andar" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Quantos Andares Subir de Escada?</label>
+                                <input type="number" id="proj-andares" value="0" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Distância da Av. Aricanduva (KM)</label>
+                                <input type="number" id="proj-km" value="10" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Custo de Pedágio (Se houver - R$)</label>
+                                <input type="number" id="proj-pedagio" value="0" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Prazo Estimado (Em Dias)</label>
+                                <input type="number" id="proj-dias" value="1" min="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- 5. Margem e Formas de Pagamento -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Margem de Lucro Desejada (%)</label>
+                            <input type="number" id="proj-margem" value="40" min="0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-green-400 font-extrabold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Desconto à vista / PIX (%)</label>
+                            <input type="number" id="proj-desc-pix" value="10" min="0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-blue-400 font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Parcelas no Cartão (Sem juros)</label>
+                            <select id="proj-parcelas" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">1x (Sem Juros)</option>
+                                <option value="2">2x (Sem Juros)</option>
+                                <option value="3">3x (Sem Juros)</option>
+                                <option value="4">4x (Sem Juros)</option>
+                                <option value="5">5x (Sem Juros)</option>
+                                <option value="6">6x (Sem Juros)</option>
+                                <option value="8" selected>8x (Sem Juros)</option>
+                                <option value="10">10x (Sem Juros)</option>
+                                <option value="12">12x (Sem Juros)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="processarCalculos()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-extrabold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-950/40 text-sm md:text-base">
+                        <i data-lucide="calculator" class="w-5 h-5"></i> REALIZAR ENGENHARIA DE PRECIFICAÇÃO
+                    </button>
+                </div>
+
+                <!-- ÁREA DE RESULTADO DE DUPLO IMPACTO (Direita) -->
+                <div class="lg:col-span-5 flex flex-col gap-6">
+                    
+                    <!-- ABAS DE NAVEGAÇÃO DE RESULTADOS -->
+                    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                        <button onclick="mudarPainelVisualizacao('espelho')" id="btn-painel-espelho" class="flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white">
+                            📊 Espelho de Custos (Interno)
+                        </button>
+                        <button onclick="mudarPainelVisualizacao('cliente')" id="btn-painel-cliente" class="flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
+                            📄 Orçamento do Cliente
+                        </button>
+                    </div>
+
+                    <!-- PAINEL 1: ESPELHO DE CUSTOS INTERNO (Visão Administrativa) -->
+                    <div id="painel-espelho" class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="shield-alert" class="w-4.5 h-4.5"></i> Detalhes Financeiros Internos
+                            </h3>
+                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold">Confidencial</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                                <span class="text-slate-400">Custo Total de Materiais (Cobre, cabo, suporte...)</span>
+                                <span id="esp-custo-materiais" class="font-bold text-white">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                                <span class="text-slate-400">Custo Mão de Obra Base (Pelo BTU / Sistema)</span>
+                                <span id="esp-custo-mo-base" class="font-bold text-white">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                                <span class="text-slate-400">Adicional de Complexidade (Escadas, Infra, Acesso)</span>
+                                <span id="esp-custo-complexidade" class="font-bold text-white">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                                <span class="text-slate-400">Diária da Equipe de Execução (Dias x Taxa)</span>
+                                <span id="esp-custo-diaria" class="font-bold text-white">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                                <span class="text-slate-400">Custo Logístico (KM ida/volta + Pedágio)</span>
+                                <span id="esp-custo-logistica" class="font-bold text-white">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between py-2 bg-slate-950 px-3 rounded-lg font-bold text-slate-200">
+                                <span>Custo Total Operacional</span>
+                                <span id="esp-custo-operacional" class="text-red-400">R$ 0,00</span>
+                            </div>
+
+                            <div class="pt-2">
+                                <div class="flex justify-between text-sm py-1 font-bold">
+                                    <span class="text-slate-300">Margem Comercial Adicionada</span>
+                                    <span id="esp-percentual-margem" class="text-green-400">0%</span>
+                                </div>
+                                <div class="flex justify-between text-sm py-1 font-bold">
+                                    <span class="text-slate-300">Lucro Bruto Projetado</span>
+                                    <span id="esp-valor-lucro" class="text-green-400">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card de Preço de Venda Final Sugerido -->
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+                            <span class="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Preço de Venda Sugerido (Final)</span>
+                            <div id="esp-venda-sugerida" class="text-3xl font-black text-emerald-400">R$ 0,00</div>
+                            <p class="text-[10px] text-slate-400">Preço ideal para cobertura de todos os custos + lucro.</p>
+                        </div>
+                    </div>
+
+                    <!-- PAINEL 2: ORÇAMENTO DO CLIENTE (Visão Comercial Pronta para Envio) -->
+                    <div id="painel-cliente" class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-xl space-y-4 hidden">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-4.5 h-4.5"></i> Proposta para o Cliente
+                            </h3>
+                            <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2.5 py-0.5 rounded-full font-bold">Orçamento Oficial</span>
+                        </div>
+
+                        <!-- Área de Visualização com Layout Timbrado de Impressão -->
+                        <div id="area-impressao" class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4 text-xs">
+                            <!-- Header do documento -->
+                            <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                                <div>
+                                    <h4 class="font-extrabold text-blue-400 text-sm">EM SOLUÇÕES | CLIMATIZAÇÃO</h4>
+                                    <p class="text-[9px] text-slate-400">Avenida Aricanduva, 9254 - São Paulo/SP</p>
+                                    <p class="text-[9px] text-slate-400">CNPJ: 65.063.813/0001-76</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-[10px]" id="doc-data">Data: --/--/----</p>
+                                    <p class="text-[9px] text-slate-500">Validade: 5 dias úteis</p>
+                                </div>
+                            </div>
+
+                            <!-- Cliente -->
+                            <div>
+                                <h5 class="font-bold text-slate-300 uppercase text-[9px] tracking-wider mb-1">Dados do Destinatário</h5>
+                                <p class="font-semibold text-white" id="doc-cliente">Cliente: </p>
+                                <p class="text-slate-400" id="doc-endereco">Local: </p>
+                                <p class="text-slate-400" id="doc-contato">Contato: </p>
+                            </div>
+
+                            <!-- Descrição técnica com gatilhos de vendas -->
+                            <div class="space-y-1.5 border-t border-b border-slate-800 py-3">
+                                <h5 class="font-bold text-slate-300 uppercase text-[9px] tracking-wider">Descrição dos Serviços</h5>
+                                <p class="text-[11px] text-white leading-relaxed">
+                                    Prestação de serviços de engenharia e instalação especializada para sistema <strong id="doc-sistema-nome">--</strong>.
+                                </p>
+                                <ul class="list-disc pl-4 space-y-1 text-[10px] text-slate-300" id="doc-detalhes-lista">
+                                    <!-- Preenchido via JS -->
+                                </ul>
+                            </div>
+
+                            <!-- Valores e Formas de Pagamento -->
+                            <div class="bg-slate-900 p-3 rounded-lg space-y-2 border border-slate-800">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-slate-300 text-[10px] uppercase">À Vista / PIX (Com Desconto)</span>
+                                    <span id="doc-valor-pix" class="font-black text-emerald-400 text-lg">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-slate-800/60 pt-2">
+                                    <span class="font-bold text-slate-300 text-[10px] uppercase" id="doc-txt-parcelas">Ou Parcelado no Cartão</span>
+                                    <span id="doc-valor-cartao" class="font-extrabold text-white text-sm">R$ 0,00</span>
+                                </div>
+                                <div class="text-[9px] text-slate-500 text-right leading-tight" id="doc-obs-parcelas">
+                                    Disponível em até -- parcelas sem juros de R$ -- no cartão de crédito.
+                                </div>
+                            </div>
+
+                            <!-- Garantia Legal/Compliance -->
+                            <div class="text-[9px] text-slate-400 leading-tight">
+                                <strong>Garantia Técnica:</strong> 1 ano de garantia para instalações sob manutenção contratual PMOC da EM Soluções. Todo o processo é executado de acordo com as normas NBR 16401 da ABNT e especificações originais dos fabricantes.
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ações Comerciais -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="copiarOrcamentoWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                                <i data-lucide="share-2" class="w-4 h-4"></i> WhatsApp Copiar
+                            </button>
+                            <button onclick="imprimirOrcamento()" class="bg-slate-800 hover:bg-slate-700 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                                <i data-lucide="printer" class="w-4 h-4"></i> Imprimir PDF
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ABA 2: CENTRAL DE CONFIGURAÇÕES DE INSUMOS ================= -->
+        <section id="aba-configuracao" class="space-y-6 hidden">
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="settings" class="text-blue-500 w-5 h-5"></i> Central de Custos e Tabelas Base
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Defina os valores dos insumos comprados do fornecedor e diárias de equipe.</p>
+                    </div>
+                    
+                    <!-- BOTÕES DE BACKUP E SALVAMENTO -->
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Botões de Sincronização / Backup -->
+                        <button onclick="exportarBackupJSON()" class="bg-emerald-650 hover:bg-emerald-700 text-white border border-emerald-550 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+                            <i data-lucide="download-cloud" class="w-4 h-4"></i> Exportar Preços
+                        </button>
+                        
+                        <button onclick="document.getElementById('input-file-backup').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Importar Backup
+                        </button>
+                        <input type="file" id="input-file-backup" accept=".json" class="hidden" onchange="importarBackupJSON(this)">
+
+                        <button onclick="restaurarValoresPadrao()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Voltar Padrão
+                        </button>
+                        
+                        <button onclick="salvarConfiguracoes()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1 shadow-lg shadow-blue-900/40">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Salvar Tabela
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- 1. Cobre e Tubulações -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="wrench" class="w-4 h-4"></i> Cobre e Tubulação (Custo por Metro)
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Bitola 1/4"</span>
+                                <input type="number" id="cfg-bitola-14" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Bitola 3/8"</span>
+                                <input type="number" id="cfg-bitola-38" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Bitola 1/2"</span>
+                                <input type="number" id="cfg-bitola-12" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Bitola 5/8"</span>
+                                <input type="number" id="cfg-bitola-58" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Bitola 3/4"</span>
+                                <input type="number" id="cfg-bitola-34" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Outros Materiais e Suportes -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="package" class="w-4 h-4"></i> Cabos, Suportes e Isolações
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Cabo PP (Custo por metro)</span>
+                                <input type="number" id="cfg-cabo-pp" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Suporte P (9k-12k BTUs)</span>
+                                <input type="number" id="cfg-suporte-p" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Suporte M (18k-24k BTUs)</span>
+                                <input type="number" id="cfg-suporte-m" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Suporte G (30k-60k BTUs)</span>
+                                <input type="number" id="cfg-suporte-g" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Mão de Obra e Diária Técnica -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="users" class="w-4 h-4"></i> Equipes, Diárias e Logística
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Diária Técnica de Equipe (Dia)</span>
+                                <input type="number" id="cfg-diaria" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Custo Logístico por KM (Duplicado)</span>
+                                <input type="number" id="cfg-km" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Mão de Obra de Instalação (Split Hi-Wall por BTUs) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="cpu" class="w-4 h-4"></i> Instalação Hi-Wall (Mão de Obra Base)
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">09.000 BTUs</span>
+                                <input type="number" id="cfg-mo-hw-9k" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">12.000 BTUs</span>
+                                <input type="number" id="cfg-mo-hw-12k" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">18.000 BTUs</span>
+                                <input type="number" id="cfg-mo-hw-18k" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">24.000 BTUs</span>
+                                <input type="number" id="cfg-mo-hw-24k" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">30.000 / 36.000 BTUs</span>
+                                <input type="number" id="cfg-mo-hw-30k" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Mão de Obra Sistemas Robustos (Sistemas de Grande Porte) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="building" class="w-4 h-4"></i> Sistemas Robustos (Preço Base MO)
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Piso Teto (Média)</span>
+                                <input type="number" id="cfg-mo-piso-teto" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Cassete (Média)</span>
+                                <input type="number" id="cfg-mo-cassete" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">VRF / VRV (Por Evaporadora)</span>
+                                <input type="number" id="cfg-mo-vrf" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Chiller (Mão de Obra Base)</span>
+                                <input type="number" id="cfg-mo-chiller" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Fatores de Dificuldade Adicionais -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-extrabold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i> Multiplicadores de Complexidade
+                        </h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Escada Grande (Adicional R$)</span>
+                                <input type="number" id="cfg-add-escada" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Andaime Técnico (Adicional R$)</span>
+                                <input type="number" id="cfg-add-andaime" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Alpinismo / Rapel (Adicional R$)</span>
+                                <input type="number" id="cfg-add-rapel" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Embutir Alvenaria (Custo por ponto)</span>
+                                <input type="number" id="cfg-add-embutida" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Prédio sem Elevador (Por andar)</span>
+                                <input type="number" id="cfg-add-andar" class="w-24 bg-slate-900 border border-slate-800 p-1.5 rounded text-right font-bold text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ABA 3: HISTÓRICO DE ORÇAMENTOS ================= -->
+        <section id="aba-historico" class="space-y-6 hidden">
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Propostas e Histórico de Cálculo</h2>
+                        <p class="text-xs text-slate-400 mt-1">Veja ou recupere orçamentos gerados anteriormente neste dispositivo.</p>
+                    </div>
+                    <button onclick="limparHistoricoCompleto()" class="bg-red-950 hover:bg-red-900 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-xl text-xs font-bold transition-all">
+                        Limpar Tudo
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-xs text-left text-slate-300">
+                        <thead class="text-slate-500 bg-slate-950 text-[10px] uppercase font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="px-4 py-3">Data</th>
+                                <th class="px-4 py-3">Cliente</th>
+                                <th class="px-4 py-3">Equipamento</th>
+                                <th class="px-4 py-3">Valor Pix</th>
+                                <th class="px-4 py-3 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-historico">
+                            <!-- Inseridos dinamicamente por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION EM SOLUÇÕES -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-800 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
+        <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+            <i data-lucide="info" class="w-4 h-4"></i>
+        </div>
+        <div>
+            <p id="toast-title" class="text-xs font-bold text-slate-100"></p>
+            <p id="toast-desc" class="text-[10px] text-slate-400"></p>
+        </div>
+    </div>
+
+    <!-- LOGICA E ALGORITMOS EM JAVASCRIPT -->
+    <script>
+        // Inicializa ícones Lucide
+        lucide.createIcons();
+
+        // Valores e configurações iniciais padrão para persistência no LocalStorage
+        const valoresPadrao = {
+            "bitola_14": 35.00,
+            "bitola_38": 42.00,
+            "bitola_12": 52.00,
+            "bitola_58": 68.00,
+            "bitola_34": 82.00,
+            "cabo_pp": 8.00,
+            "suporte_p": 45.00,
+            "suporte_m": 75.00,
+            "suporte_g": 120.00,
+            "diaria": 400.00,
+            "km": 2.50,
+            "mo_hw_9k": 650.00,
+            "mo_hw_12k": 700.00,
+            "mo_hw_18k": 850.00,
+            "mo_hw_24k": 1050.00,
+            "mo_hw_30k": 1300.00,
+            "mo_piso_teto": 1200.00,
+            "mo_cassete": 1400.00,
+            "mo_vrf": 600.00,
+            "mo_chiller": 3500.00,
+            "add_escada": 150.00,
+            "add_andaime": 350.00,
+            "add_rapel": 650.00,
+            "add_embutida": 250.00,
+            "add_andar": 50.00
+        };
+
+        // Carrega configurações persistidas ou usa as originais
+        let configuracoes = {};
+        function inicializarConfiguracoes() {
+            const salvas = localStorage.getItem('em_solucoes_configuracoes');
+            if (salvas) {
+                configuracoes = JSON.parse(salvas);
+            } else {
+                configuracoes = {...valoresPadrao};
+                localStorage.setItem('em_solucoes_configuracoes', JSON.stringify(configuracoes));
+            }
+            carregarConfiguracoesCampos();
+        }
+
+        // Popula as inputs do painel de configuração
+        function carregarConfiguracoesCampos() {
+            Object.keys(configuracoes).forEach(key => {
+                const el = document.getElementById(`cfg-${key.replace('_', '-')}`);
+                if (el) el.value = configuracoes[key];
+            });
+        }
+
+        // Salva as alterações da aba de configurações
+        function salvarConfiguracoes() {
+            Object.keys(configuracoes).forEach(key => {
+                const el = document.getElementById(`cfg-${key.replace('_', '-')}`);
+                if (el) configuracoes[key] = parseFloat(el.value) || 0;
+            });
+            localStorage.setItem('em_solucoes_configuracoes', JSON.stringify(configuracoes));
+            dispararToast("Configurações Salvas!", "Os novos custos e taxas de mercado já estão valendo.");
+            desenhar();
+        }
+
+        // Restaura as configurações originais padrão
+        function restaurarValoresPadrao() {
+            configuracoes = {...valoresPadrao};
+            carregarConfiguracoesCampos();
+            localStorage.setItem('em_solucoes_configuracoes', JSON.stringify(configuracoes));
+            dispararToast("Tabelas Restauradas", "Os valores originais foram recarregados com sucesso.");
+        }
+
+        // EXPORTAR BACKUP COMO ARQUIVO JSON
+        function exportarBackupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configuracoes, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "EM_Solucoes_Precos_Backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            dispararToast("Preços Exportados!", "Backup salvo com sucesso na sua pasta de Downloads.");
+        }
+
+        // IMPORTAR BACKUP DE ARQUIVO JSON
+        function importarBackupJSON(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dadosImportados = JSON.parse(e.target.result);
+                    // Validar se o arquivo importado contém as chaves de precificação necessárias
+                    const chavesPadrao = Object.keys(valoresPadrao);
+                    const temChavesValidas = chavesPadrao.some(key => key in dadosImportados);
+
+                    if (temChavesValidas) {
+                        configuracoes = { ...valoresPadrao, ...dadosImportados };
+                        localStorage.setItem('em_solucoes_configuracoes', JSON.stringify(configuracoes));
+                        carregarConfiguracoesCampos();
+                        processarCalculos();
+                        dispararToast("Backup Restaurado!", "Seus preços personalizados foram aplicados com sucesso.");
+                    } else {
+                        dispararToast("Erro no Arquivo", "O arquivo selecionado não é um backup de preços válido.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    dispararToast("Falha na Importação", "Erro ao processar o arquivo de backup de preços.");
+                }
+            };
+            reader.readAsText(file);
+            input.value = ''; // Limpar input para permitir re-upload
+        }
+
+        // Capacidades por tipo de ar condicionado
+        const capacidadesBTUs = {
+            "split": [
+                { value: "9000", label: "09.000 BTUs" },
+                { value: "12000", label: "12.000 BTUs" },
+                { value: "18000", label: "18.000 BTUs" },
+                { value: "24000", label: "24.000 BTUs" },
+                { value: "30000_36000", label: "30.000 a 36.000 BTUs" }
+            ],
+            "piso_teto": [
+                { value: "24000", label: "24.000 BTUs" },
+                { value: "36000", label: "36.000 BTUs" },
+                { value: "48000", label: "48.000 BTUs" },
+                { value: "60000", label: "60.000 BTUs" }
+            ],
+            "cassete_1v": [
+                { value: "9000", label: "09.000 BTUs" },
+                { value: "12000", label: "12.000 BTUs" }
+            ],
+            "cassete_4v": [
+                { value: "18000", label: "18.000 BTUs" },
+                { value: "24000", label: "24.000 BTUs" },
+                { value: "36000", label: "36.000 BTUs" },
+                { value: "48000", label: "48.000 BTUs" }
+            ],
+            "multi_split": [
+                { value: "bi", label: "Bi-Split (Até 2 Evaporadoras)" },
+                { value: "tri", label: "Tri-Split (Até 3 Evaporadoras)" },
+                { value: "quadri", label: "Quadri-Split (Até 4 Evaporadoras)" },
+                { value: "penta", label: "Penta-Split (Até 5 Evaporadoras)" }
+            ],
+            "vrf": [
+                { value: "pequeno", label: "Mini VRF" },
+                { value: "medio", label: "VRF Comercial Médio" },
+                { value: "grande", label: "VRF Central Industrial" }
+            ],
+            "chiller": [
+                { value: "chiller", label: "Sistema Chiller Central" }
+            ],
+            "splitao": [
+                { value: "splitao", label: "Splitão Central" }
+            ]
+        };
+
+        // Atualiza as capacidades de BTUs conforme a máquina selecionada
+        function atualizarInterfaceCapacidades() {
+            const sistema = document.getElementById('proj-sistema').value;
+            const btuSelect = document.getElementById('proj-btu');
+            
+            btuSelect.innerHTML = "";
+            capacidadesBTUs[sistema].forEach(opt => {
+                const optEl = document.createElement('option');
+                optEl.value = opt.value;
+                optEl.innerText = opt.label;
+                btuSelect.appendChild(optEl);
+            });
+        }
+
+        // Alterna o campo de inserção de andares caso não tenha elevador
+        function alternarCampoAndar() {
+            const acesso = document.getElementById('proj-acesso').value;
+            const containerAndar = document.getElementById('container-andar');
+            if (acesso === 'sem_elevador') {
+                containerAndar.classList.remove('hidden');
+            } else {
+                containerAndar.classList.add('hidden');
+                document.getElementById('proj-andares').value = 0;
+            }
+        }
+
+        // Alternar visualização das abas superiores
+        function mudarAba(aba) {
+            ["calculadora", "configuracao", "historico"].forEach(item => {
+                document.getElementById(`aba-${item}`).classList.add('hidden');
+                document.getElementById(`tab-${item}`).className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all text-slate-400 hover:text-white";
+            });
+
+            document.getElementById(`aba-${aba}`).classList.remove('hidden');
+            document.getElementById(`tab-${aba}`).className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all bg-blue-600 text-white";
+
+            if (aba === 'historico') {
+                desenharHistorico();
+            }
+        }
+
+        // Alternar o painel visualizador entre espelho interno e orçamento do cliente
+        function mudarPainelVisualizacao(painel) {
+            ["espelho", "cliente"].forEach(item => {
+                document.getElementById(`painel-${item}`).classList.add('hidden');
+                document.getElementById(`btn-painel-${item}`).className = "flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+            });
+
+            document.getElementById(`painel-${painel}`).classList.remove('hidden');
+            document.getElementById(`btn-painel-${painel}`).className = "flex-1 text-center py-2.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white";
+        }
+
+        // Variáveis de estado calculadas para exportação
+        let orcamentoFinalParaSalvar = {};
+
+        // ALGORITMO COMPLETO DE CÁLCULO DE ENGENHARIA DE CUSTOS
+        function processarCalculos() {
+            // Inputs dos dados do cliente
+            const cliente = document.getElementById('proj-cliente').value || "Cliente Particular";
+            const fone = document.getElementById('proj-fone').value || "Não Informado";
+            const bairro = document.getElementById('proj-bairro').value || "São Paulo - SP";
+            const endereco = document.getElementById('proj-endereco').value || "Não Informado";
+
+            // Inputs do projeto
+            const sistema = document.getElementById('proj-sistema').value;
+            const btu = document.getElementById('proj-btu').value;
+            const qtdMaquinas = parseInt(document.getElementById('proj-qtd').value) || 1;
+
+            // Materiais escolhidos
+            const bitola1 = document.getElementById('proj-bitola-1').value;
+            const m1 = parseFloat(document.getElementById('proj-cobre-m1').value) || 0;
+            const bitola2 = document.getElementById('proj-bitola-2').value;
+            const m2 = parseFloat(document.getElementById('proj-cobre-m2').value) || 0;
+            const caboPP = parseFloat(document.getElementById('proj-cabo-pp').value) || 0;
+            const suporte = document.getElementById('proj-suporte').value;
+
+            // Complexidades e logística
+            const altura = document.getElementById('proj-altura').value;
+            const infra = document.getElementById('proj-infra').value;
+            const acesso = document.getElementById('proj-acesso').value;
+            const andares = parseInt(document.getElementById('proj-andares').value) || 0;
+            const km = parseFloat(document.getElementById('proj-km').value) || 0;
+            const pedagio = parseFloat(document.getElementById('proj-pedagio').value) || 0;
+            const dias = parseInt(document.getElementById('proj-dias').value) || 1;
+
+            // Financeiro
+            const margem = parseFloat(document.getElementById('proj-margem').value) || 30;
+            const descPix = parseFloat(document.getElementById('proj-desc-pix').value) || 10;
+            const parcelas = parseInt(document.getElementById('proj-parcelas').value) || 1;
+
+            // 1. CÁLCULO DE MATERIAIS
+            let custoMateriais = 0;
+            custoMateriais += m1 * configuracoes[bitola1];
+            if (bitola2 !== 'nenhuma') {
+                custoMateriais += m2 * configuracoes[bitola2];
+            }
+            custoMateriais += caboPP * configuracoes["cabo_pp"];
+
+            if (suporte !== 'nenhum') {
+                custoMateriais += configuracoes[suporte];
+            }
+            custoMateriais = custoMateriais * qtdMaquinas;
+
+            // 2. CÁLCULO DE MÃO DE OBRA BASE
+            let custoMOBase = 0;
+            if (sistema === 'split') {
+                if (btu === '9000') custoMOBase = configuracoes["mo_hw_9k"];
+                else if (btu === '12000') custoMOBase = configuracoes["mo_hw_12k"];
+                else if (btu === '18000') custoMOBase = configuracoes["mo_hw_18k"];
+                else if (btu === '24000') custoMOBase = configuracoes["mo_hw_24k"];
+                else custoMOBase = configuracoes["mo_hw_30k"];
+            } else if (sistema === 'piso_teto') {
+                custoMOBase = configuracoes["mo_piso_teto"];
+            } else if (sistema === 'cassete_1v' || sistema === 'cassete_4v') {
+                custoMOBase = configuracoes["mo_cassete"];
+            } else if (sistema === 'multi_split') {
+                custoMOBase = configuracoes["mo_vrf"]; // Usa fator Multi base
+            } else if (sistema === 'vrf') {
+                custoMOBase = configuracoes["mo_vrf"];
+            } else if (sistema === 'chiller') {
+                custoMOBase = configuracoes["mo_chiller"];
+            } else {
+                custoMOBase = configuracoes["mo_piso_teto"] * 1.5; // Splitão
+            }
+
+            custoMOBase = custoMOBase * qtdMaquinas;
+
+            // 3. CÁLCULO DE COMPLEXIDADE ADICIONAL
+            let custoComplexidade = 0;
+            if (altura === 'escada') custoComplexidade += configuracoes["add_escada"];
+            if (altura === 'andaime') custoComplexidade += configuracoes["add_andaime"];
+            if (altura === 'rapel') custoComplexidade += configuracoes["add_rapel"];
+
+            if (infra === 'embutida_parede') custoComplexidade += configuracoes["add_embutida"] * m1;
+            if (infra === 'embutida_gesso') custoComplexidade += configuracoes["add_embutida"] * 0.6 * m1;
+
+            if (acesso === 'sem_elevador') {
+                custoComplexidade += (andares * configuracoes["add_andar"]) * qtdMaquinas;
+            }
+
+            // 4. CÁLCULO DE DIÁRIAS
+            let custoDiarias = dias * configuracoes["diaria"];
+
+            // 5. CÁLCULO DE LOGÍSTICA
+            let custoLogistica = (km * 2 * configuracoes["km"]) + pedagio;
+
+            // CUSTO TOTAL DIRETO OPERACIONAL
+            const custoTotalOperacional = custoMateriais + custoMOBase + custoComplexidade + custoDiarias + custoLogistica;
+
+            // 6. PREÇO DE VENDA COM MARGEM DO CLIENTE
+            const precoVendaFinal = custoTotalOperacional * (1 + (margem / 100));
+            const lucroRealComercial = precoVendaFinal - custoTotalOperacional;
+
+            // 7. PREÇO PIX (Com desconto aplicado)
+            const precoPixFinal = precoVendaFinal * (1 - (descPix / 100));
+
+            // ATUALIZAR INTERFACE DO ESPELHO DE CUSTOS (INTERNO)
+            document.getElementById('esp-custo-materiais').innerText = formatarDinheiro(custoMateriais);
+            document.getElementById('esp-custo-mo-base').innerText = formatarDinheiro(custoMOBase);
+            document.getElementById('esp-custo-complexidade').innerText = formatarDinheiro(custoComplexidade);
+            document.getElementById('esp-custo-diaria').innerText = formatarDinheiro(custoDiarias);
+            document.getElementById('esp-custo-logistica').innerText = formatarDinheiro(custoLogistica);
+            document.getElementById('esp-custo-operacional').innerText = formatarDinheiro(custoTotalOperacional);
+            document.getElementById('esp-percentual-margem').innerText = `${margem}%`;
+            document.getElementById('esp-valor-lucro').innerText = formatarDinheiro(lucroRealComercial);
+            document.getElementById('esp-venda-sugerida').innerText = formatarDinheiro(precoVendaFinal);
+
+            // ATUALIZAR INTERFACE DE PROPOSTA DO CLIENTE
+            document.getElementById('doc-data').innerText = `Data: ${obterDataAtual()}`;
+            document.getElementById('doc-cliente').innerText = `Cliente: ${cliente}`;
+            document.getElementById('doc-endereco').innerText = `Local: ${endereco} - Bairro: ${bairro}`;
+            document.getElementById('doc-contato').innerText = `Contato: ${fone}`;
+
+            // Nome fantasia do equipamento para o cliente ler
+            const txtSistema = document.getElementById('proj-sistema').options[document.getElementById('proj-sistema').selectedIndex].text;
+            const txtBtu = document.getElementById('proj-btu').options[document.getElementById('proj-btu').selectedIndex]?.text || "";
+            document.getElementById('doc-sistema-nome').innerText = `${txtSistema} (${txtBtu})`;
+
+            // Preencher detalhes da proposta do cliente
+            const docLista = document.getElementById('doc-detalhes-lista');
+            docLista.innerHTML = "";
+            
+            const itensProposta = [
+                `Fornecimento de infraestrutura e instalação para ${qtdMaquinas} unidade(s) de Climatização.`,
+                `Instalação técnica completa com passagem de tubulação e fiação por ganchos adequados.`,
+                `Flangeamento profissional com torqueamento calibrado, vácuo na linha e teste de estanqueidade.`,
+                `Uso de isolamento térmico premium tipo blindagem para proteção de vazamentos mecânicos.`,
+                `Adequação de segurança jurídica de acordo com os manuais dos fabricantes para proteção da sua garantia.`
+            ];
+
+            if (altura !== 'nenhum') {
+                itensProposta.push(`Trabalho com segurança técnica em altura (${document.getElementById('proj-altura').options[document.getElementById('proj-altura').selectedIndex].text}).`);
+            }
+            if (infra !== 'existente') {
+                itensProposta.push(`Abertura e infraestrutura de linhas do tipo: ${document.getElementById('proj-infra').options[document.getElementById('proj-infra').selectedIndex].text}.`);
+            }
+
+            itensProposta.forEach(itemText => {
+                const li = document.createElement('li');
+                li.innerText = itemText;
+                docLista.appendChild(li);
+            });
+
+            // Preço e condições finais de parcelamento
+            document.getElementById('doc-valor-pix').innerText = formatarDinheiro(precoPixFinal);
+            document.getElementById('doc-valor-cartao').innerText = formatarDinheiro(precoVendaFinal);
+            
+            const valorParcela = precoVendaFinal / parcelas;
+            document.getElementById('doc-txt-parcelas').innerText = `Ou em até ${parcelas}x no Cartão`;
+            document.getElementById('doc-obs-parcelas').innerText = `Disponível em até ${parcelas} parcelas fixas sem juros de ${formatarDinheiro(valorParcela)} no cartão de crédito.`;
+
+            // Guarda estado para salvar no histórico
+            orcamentoFinalParaSalvar = {
+                data: obterDataAtual(),
+                cliente: cliente,
+                equipamento: `${txtSistema} ${txtBtu}`,
+                valorPix: precoPixFinal,
+                valorCartao: precoVendaFinal,
+                parcelas: parcelas,
+                valorParcela: valorParcela,
+                contato: fone,
+                endereco: `${endereco}, ${bairro}`
+            };
+
+            salvarNoHistoricoLocal(orcamentoFinalParaSalvar);
+            dispararToast("Cálculo Atualizado!", "O orçamento da EM Soluções foi atualizado nos painéis ao lado.");
+        }
+
+        // Funções Auxiliares de Formatação e Data
+        function formatarDinheiro(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function obterDataAtual() {
+            const data = new Date();
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // SALVAR NO HISTÓRICO LOCAL (Persistência)
+        function salvarNoHistoricoLocal(orcamento) {
+            let historico = JSON.parse(localStorage.getItem('em_solucoes_historico') || '[]');
+            // Adiciona no início da lista para visualização rápida
+            historico.unshift(orcamento);
+            // Limita a 50 registros para não estourar o limite de armazenamento local
+            if (historico.length > 50) historico.pop();
+            localStorage.setItem('em_solucoes_historico', JSON.stringify(historico));
+        }
+
+        // CARREGAR E EXIBIR HISTÓRICO
+        function desenharHistorico() {
+            const tbody = document.getElementById('lista-historico');
+            tbody.innerHTML = "";
+            const historico = JSON.parse(localStorage.getItem('em_solucoes_historico') || '[]');
+
+            if (historico.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-500">Nenhum orçamento calculado ainda neste dispositivo.</td></tr>`;
+                return;
+            }
+
+            historico.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-800 hover:bg-slate-900/40 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-slate-400">${item.data}</td>
+                    <td class="px-4 py-3 font-semibold text-white">${item.cliente}</td>
+                    <td class="px-4 py-3 text-slate-400">${item.equipamento}</td>
+                    <td class="px-4 py-3 font-bold text-emerald-400">${formatarDinheiro(item.valorPix)}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="recuperarOrcamento(${index})" class="bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded text-[10px] font-bold transition-all">
+                            Visualizar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // RECUPERAR ORÇAMENTO DO HISTÓRICO
+        function recuperarOrcamento(index) {
+            const historico = JSON.parse(localStorage.getItem('em_solucoes_historico') || '[]');
+            const item = historico[index];
+
+            if (!item) return;
+
+            // Restaura visualização no painel
+            document.getElementById('doc-data').innerText = `Data: ${item.data}`;
+            document.getElementById('doc-cliente').innerText = `Cliente: ${item.cliente}`;
+            document.getElementById('doc-endereco').innerText = `Local: ${item.endereco}`;
+            document.getElementById('doc-contato').innerText = `Contato: ${item.contato}`;
+            document.getElementById('doc-sistema-nome').innerText = item.equipamento;
+            document.getElementById('doc-valor-pix').innerText = formatarDinheiro(item.valorPix);
+            document.getElementById('doc-valor-cartao').innerText = formatarDinheiro(item.valorCartao);
+            document.getElementById('doc-txt-parcelas').innerText = `Ou em até ${item.parcelas}x no Cartão`;
+            document.getElementById('doc-obs-parcelas').innerText = `Disponível em até ${item.parcelas} parcelas fixas sem juros de ${formatarDinheiro(item.valorParcela)} no cartão de crédito.`;
+
+            mudarAba('calculadora');
+            mudarPainelVisualizacao('cliente');
+            dispararToast("Proposta Carregada", `Orçamento de ${item.cliente} recuperado.`);
+        }
+
+        // LIMPAR HISTÓRICO
+        function limparHistoricoCompleto() {
+            localStorage.removeItem('em_solucoes_historico');
+            desenharHistorico();
+            dispararToast("Histórico Limpo", "Todos os dados salvos localmente foram removidos.");
+        }
+
+        // EXPORTAR ORÇAMENTO PARA WHATSAPP (TEXTO FORMATADO)
+        function copiarOrcamentoWhatsApp() {
+            const textToCopy = `*EM SOLUÇÕES | CLIMATIZAÇÃO* ❄️\n` +
+                               `_Especialistas em Climatização e Soluções Térmicas em SP_\n\n` +
+                               `*PROPOSTA COMERCIAL DE INSTALAÇÃO*\n` +
+                               `📅 *Data:* ${orcamentoFinalParaSalvar.data || obterDataAtual()}\n` +
+                               `👤 *Cliente:* ${orcamentoFinalParaSalvar.cliente || "Cliente Especial"}\n` +
+                               `📍 *Local de Instalação:* ${orcamentoFinalParaSalvar.endereco || "São Paulo - SP"}\n` +
+                               `💻 *Equipamento:* ${orcamentoFinalParaSalvar.equipamento || "Split Hi-Wall"}\n\n` +
+                               `*Detalhamento do Serviço:*\n` +
+                               `✔️ Instalação técnica seguindo normas da NBR 16401 ABNT.\n` +
+                               `✔️ Uso de materiais de alta qualidade e isolamento premium.\n` +
+                               `✔️ Vácuo nas linhas de cobre e garantia de 1 ano para os serviços.\n\n` +
+                               `*CONDIÇÕES ESPECIAIS DE PAGAMENTO:*\n` +
+                               `💰 *À Vista no PIX (com desconto):* ${formatarDinheiro(orcamentoFinalParaSalvar.valorPix || 0)}\n` +
+                               `💳 *Cartão de Crédito:* ${formatarDinheiro(orcamentoFinalParaSalvar.valorCartao || 0)} em até ${orcamentoFinalParaSalvar.parcelas || 8}x sem juros no cartão de crédito.\n\n` +
+                               `💡 _Dúvidas ou agendamento de visita técnica? Responda diretamente nesta mensagem._\n` +
+                               `📞 *WhatsApp EM Soluções:* (11) 97141-8110`;
+
+            // Mecanismo seguro de cópia em navegadores e dispositivos móveis
+            const tempInput = document.createElement("textarea");
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            dispararToast("Copiado!", "A proposta em formato WhatsApp foi copiada para sua área de transferência.");
+        }
+
+        // IMPRIMIR ORÇAMENTO DO CLIENTE (PDF)
+        function imprimirOrcamento() {
+            mudarPainelVisualizacao('cliente');
+            window.print();
+        }
+
+        // NOTIFICAÇÃO DO SISTEMA (TOAST)
+        function dispararToast(titulo, desc) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = titulo;
+            document.getElementById('toast-desc').innerText = desc;
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        // AO INICIAR A APLICAÇÃO
+        window.onload = function() {
+            inicializarConfiguracoes();
+            atualizarInterfaceCapacidades();
+            processarCalculos();
+        }
+    </script>
+</body>
+</html>
+
+```
